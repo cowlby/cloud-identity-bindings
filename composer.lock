@@ -1,0 +1,38 @@
+{
+    "hash": "86cc12e2169f9ace65bd54a74d37b66e",
+    "packages": [
+        {
+            "package": "cowlby/cloud-bindings-common",
+            "version": "dev-master",
+            "source-reference": "047700eb8271928d107a1453b0b10dfc30927873",
+            "commit-date": "1341704185"
+        },
+        {
+            "package": "guzzle/guzzle",
+            "version": "v2.7.2"
+        },
+        {
+            "package": "kriswallsmith/buzz",
+            "version": "v0.7"
+        },
+        {
+            "package": "pimple/pimple",
+            "version": "dev-master",
+            "source-reference": "d2cfa2f02f50abef65c238747c753a5f6786f6be",
+            "commit-date": "1341139100"
+        },
+        {
+            "package": "symfony/event-dispatcher",
+            "version": "v2.0.15"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "cowlby/cloud-bindings-common": 20,
+        "pimple/pimple": 20
+    }
+}
