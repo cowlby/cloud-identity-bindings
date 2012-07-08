@@ -4,28 +4,28 @@
     "type": "library",
     "keywords": ["rackspace cloud", "cloud identity", "api bindings"],
     "license": "MIT",
-    
+
     "authors": [
         {
             "name": "Jose Prado",
             "email": "git@cowlby.com"
         }
     ],
-    
+
     "require": {
         "php": ">=5.3.2",
-    	"cowlby/cloud-bindings-common": "dev-master",
+        "cowlby/cloud-bindings-common": "dev-master",
         "kriswallsmith/buzz": "v0.7",
         "guzzle/guzzle": "*",
         "pimple/pimple": "dev-master"
     },
-    
+
     "autoload": {
         "psr-0": {
             "Cowlby\\Rackspace\\Cloud\\Identity": "src/"
         }
     },
-    
+
     "repositories": [
         {
             "type": "vcs",
