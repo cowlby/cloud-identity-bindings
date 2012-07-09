@@ -2,6 +2,8 @@
 
 namespace Cowlby\Rackspace\Cloud\Identity;
 
+use Cowlby\Rackspace\Cloud\Common\Cache\CacheAdapterInterface;
+
 use Cowlby\Rackspace\Cloud\Common\HydratorInterface;
 use Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface;
 use Cowlby\Rackspace\Cloud\Identity\Entity;
@@ -16,15 +18,18 @@ class TokenManager
 
     protected $hydrator;
 
+    protected $cache;
+
     protected $token;
 
     protected $serviceCatalog;
 
-    public function __construct(CredentialsInterface $credentials, GuzzleClient $client, HydratorInterface $hydrator)
+    public function __construct(CredentialsInterface $credentials, GuzzleClient $client, HydratorInterface $hydrator, CacheAdapterInterface $cache)
     {
         $this->setCredentials($credentials);
         $this->setClient($client);
         $this->setHydrator($hydrator);
+        $this->setCache($cache);
     }
 
     public function setCredentials(CredentialsInterface $credentials)
@@ -45,6 +50,12 @@ class TokenManager
         return $this;
     }
 
+    public function setCache(CacheAdapterInterface $cache)
+    {
+    	$this->cache = $cache;
+    	return $this;
+    }
+
     public function getCredentials()
     {
         return $this->credentials;
@@ -57,32 +68,44 @@ class TokenManager
 
     public function getToken()
     {
-        if ($this->token === NULL) {
+    	$token = $this->cache->fetch($this->getTokenCacheId());
+
+        if ($token === FALSE) {
             $this->authenticate();
+        } else {
+        	$this->token = unserialize($token);
         }
 
         return $this->token;
     }
 
+    public function getTokenCacheId()
+    {
+    	return sprintf('[%s][%s]', md5($this->credentials->getPayload()), 'token');
+    }
+
     public function getServiceCatalog()
     {
-        if ($this->serviceCatalog === NULL) {
+    	$serviceCatalog = $this->cache->fetch($this->getServiceCatalogCacheId());
+
+        if ($serviceCatalog === FALSE) {
             $this->authenticate();
+        } else {
+        	$this->serviceCatalog = unserialize($serviceCatalog);
         }
 
         return $this->serviceCatalog;
     }
 
+    public function getServiceCatalogCacheId()
+    {
+    	return sprintf('[%s][%s]', md5($this->credentials->getPayload()), 'serviceCatalog');
+    }
+
     protected function authenticate()
     {
-        $request = $this->client->post('tokens');
-        $request->setBody($this->credentials->getPayload());
-
-        try {
-            $response = $request->send();
-        } catch (BadResponseException $e) {
-            throw $e;
-        }
+        $request = $this->client->post('tokens', NULL, $this->credentials->getPayload());
+        $response = $request->send();
 
         $json = json_decode($response->getBody(), TRUE);
 
@@ -103,6 +126,9 @@ class TokenManager
                 $service->addEndpoint($endpoint);
             }
         }
+
+        $this->cache->save($this->getTokenCacheId(), serialize($this->token));
+        $this->cache->save($this->getServiceCatalogCacheId(), serialize($this->serviceCatalog));
 
         return $this;
     }

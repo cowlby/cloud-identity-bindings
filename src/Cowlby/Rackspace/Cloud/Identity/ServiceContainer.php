@@ -4,6 +4,7 @@ namespace Cowlby\Rackspace\Cloud\Identity;
 
 use Pimple;
 use Cowlby\Rackspace\Cloud\Common\SetterHydrator;
+use Cowlby\Rackspace\Cloud\Common\Cache\NullCacheAdapter;
 use Guzzle\Service\Client as GuzzleClient;
 
 class ServiceContainer extends Pimple
@@ -13,28 +14,29 @@ class ServiceContainer extends Pimple
 
     public function __construct()
     {
-        $this['api.version'] = '2.0';
-
-        $this['api.content_type'] = 'application/json';
-
-        $this['api.accept'] = 'application/json';
+        $this['endpoint'] = self::AUTH_ENDPOINT_US;
 
         $this['hydrator'] = $this->share(function($container) {
 
             return new SetterHydrator();
         });
 
+    	$this['cache'] = $this->share(function($container) {
+
+    		return new NullCacheAdapter();
+    	});
+
         $this['client'] = $this->share(function($container) {
 
-            $client = new GuzzleClient($container['auth_endpoint'] . '/v{version}', array(
-                'version' => $container['api.version'],
+            $client = new GuzzleClient($container['endpoint'] . '/v{version}', array(
+                'version' => '2.0',
                 'curl.CURLOPT_SSL_VERIFYHOST' => FALSE,
                 'curl.CURLOPT_SSL_VERIFYPEER' => FALSE
             ));
 
             $client->setDefaultHeaders(array(
-                'Content-Type' => $container['api.content_type'],
-                'Accept' => $container['api.accept']
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
             ));
 
             return $client;
@@ -43,21 +45,21 @@ class ServiceContainer extends Pimple
         $this['token_manager'] = $this->share(function($container) {
 
             return new TokenManager(
-                $container['credentials'],
-                $container['client'],
-                $container['hydrator']
-            );
+        	    $container['credentials'],
+        		$container['client'],
+        		$container['hydrator'],
+        		$container['cache']
+        	);
         });
 
         $this['user_manager'] = $this->share(function($container) {
 
-            $xAuthToken = $container['token_manager']->getToken()->getId();
-            $container['client']->getDefaultHeaders()->set('X-Auth-Token', $xAuthToken);
+            $container['client']
+                ->getDefaultHeaders()
+                ->set('X-Auth-Token', $container['token_manager']->getToken()->getId())
+            ;
 
-            return new UserManager(
-                $container['client'],
-                $container['hydrator']
-            );
+            return new UserManager($container['client'], $container['hydrator']);
         });
     }
 }
