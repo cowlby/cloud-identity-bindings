@@ -71,9 +71,15 @@ class TokenManager
     	$token = $this->cache->fetch($this->getTokenCacheId());
 
         if ($token === FALSE) {
+
             $this->authenticate();
         } else {
+
         	$this->token = unserialize($token);
+
+            if (!$this->token->isValid()) {
+            	$this->authenticate();
+            }
         }
 
         return $this->token;

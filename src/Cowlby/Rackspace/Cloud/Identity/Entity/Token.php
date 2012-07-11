@@ -12,6 +12,16 @@ class Token
     {
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getExpires()
+    {
+        return $this->expires;
+    }
+
     public function setId($id)
     {
         $this->id = $id;
@@ -24,13 +34,9 @@ class Token
         return $this;
     }
 
-    public function getId()
+    public function isValid()
     {
-        return $this->id;
-    }
-
-    public function getExpires()
-    {
-        return $this->expires;
+    	$now = new \DateTime();
+    	return $now < $this->expires;
     }
 }
