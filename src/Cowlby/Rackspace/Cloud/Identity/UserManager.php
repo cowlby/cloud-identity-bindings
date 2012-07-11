@@ -56,7 +56,7 @@ class UserManager
 
     public function getUserById($userId)
     {
-        $request = $this->client->get(array('users/{+userId}', array(
+        $request = $this->client->get(array('users/{userId}', array(
             'userId' => $userId
         )));
 
