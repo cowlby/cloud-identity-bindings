@@ -4,8 +4,8 @@
         {
             "package": "cowlby/cloud-bindings-common",
             "version": "dev-master",
-            "source-reference": "d8fdd14fdd4b89bb9754646a9ca5a033327807cb",
-            "commit-date": "1341854011"
+            "source-reference": "0b89dec6eccba53423953bf1922c88a20ff554b6",
+            "commit-date": "1341963258"
         },
         {
             "package": "guzzle/guzzle",
@@ -14,6 +14,12 @@
         {
             "package": "kriswallsmith/buzz",
             "version": "v0.7"
+        },
+        {
+            "package": "pimple/pimple",
+            "version": "dev-master",
+            "alias-pretty-version": "1.0.x-dev",
+            "alias-version": "1.0.9999999.9999999-dev"
         },
         {
             "package": "pimple/pimple",
