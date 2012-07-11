@@ -20,6 +20,10 @@
         "pimple/pimple": "dev-master"
     },
 
+    "require-dev": {
+        "monolog/monolog": "1.*"
+    },
+
     "autoload": {
         "psr-0": {
             "Cowlby\\Rackspace\\Cloud\\Identity": "src/"
