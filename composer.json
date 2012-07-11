@@ -15,7 +15,6 @@
     "require": {
         "php": ">=5.3.2",
         "cowlby/cloud-bindings-common": "dev-master",
-        "kriswallsmith/buzz": "v0.7",
         "guzzle/guzzle": "*",
         "pimple/pimple": "dev-master"
     },
