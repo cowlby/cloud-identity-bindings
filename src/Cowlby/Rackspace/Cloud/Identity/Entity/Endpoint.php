@@ -2,17 +2,15 @@
 
 namespace Cowlby\Rackspace\Cloud\Identity\Entity;
 
-class Endpoint
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
+class Endpoint extends AbstractEntity
 {
     protected $region;
 
-    protected $tenantId;
-
     protected $publicURL;
 
-    public function __construct()
-    {
-    }
+    protected $v1Default;
 
     /**
      * @return string
@@ -25,17 +23,17 @@ class Endpoint
     /**
      * @return string
      */
-    public function getTenantId()
-    {
-        return $this->tenantId;
-    }
-
-    /**
-     * @return string
-     */
     public function getPublicURL()
     {
         return $this->publicURL;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getV1Default()
+    {
+        return $this->v1Default;
     }
 
     /**
@@ -49,16 +47,6 @@ class Endpoint
     }
 
     /**
-     * @param string $tenantId
-     * @return \Cowlby\Rackspace\Cloud\Identity\Entity\Endpoint
-     */
-    public function setTenantId($tenantId)
-    {
-        $this->tenantId = $tenantId;
-        return $this;
-    }
-
-    /**
      * @param string $publicURL
      * @return \Cowlby\Rackspace\Cloud\Identity\Entity\Endpoint
      */
@@ -68,4 +56,14 @@ class Endpoint
         return $this;
     }
 
+    /**
+     *
+     * @param bool $v1Default
+     * @return \Cowlby\Rackspace\Cloud\Identity\Entity\Endpoint
+     */
+    public function setV1Default($v1Default)
+    {
+        $this->v1Default = (bool) $v1Default;
+        return $this;
+    }
 }

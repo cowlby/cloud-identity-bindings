@@ -39,11 +39,9 @@ class ApiKeyCredentials implements CredentialsInterface
     public function getPayload()
     {
         return json_encode(array(
-            'auth' => array(
-                'RAX-KSKEY:apiKeyCredentials' => array(
-                    'username' => $this->getUsername(),
-                    'apiKey' => $this->getApiKey()
-                )
+            'credentials' => array(
+                'username' => $this->getUsername(),
+                'key' => $this->getApiKey()
             )
         ));
     }

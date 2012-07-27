@@ -2,11 +2,11 @@
 
 namespace Cowlby\Rackspace\Cloud\Identity\Entity;
 
-class Service
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
+class Service extends AbstractEntity
 {
     protected $name;
-
-    protected $type;
 
     protected $endpoints;
 
@@ -15,20 +15,22 @@ class Service
         $this->endpoints = array();
     }
 
+    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = NULL)
+    {
+        for ($i = 0, $c = count($data); $i < $c; $i++) {
+            $this->addEndpoint($denormalizer->denormalize($data[$i], __NAMESPACE__ . '\\Endpoint', $format));
+            unset($data[$i]);
+        }
+
+        parent::denormalize($denormalizer, $data, $format);
+    }
+
     /**
      * @return string
      */
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -50,15 +52,6 @@ class Service
     public function setName($name)
     {
         $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * @param string $type
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
         return $this;
     }
 

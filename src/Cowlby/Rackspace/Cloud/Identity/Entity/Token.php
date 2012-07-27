@@ -2,7 +2,9 @@
 
 namespace Cowlby\Rackspace\Cloud\Identity\Entity;
 
-class Token
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+
+class Token extends AbstractEntity
 {
     protected $id;
 
@@ -10,6 +12,15 @@ class Token
 
     public function __construct()
     {
+    }
+
+    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = NULL)
+    {
+        if (isset($data['expires'])) {
+            $data['expires'] = new \DateTime($data['expires']);
+        }
+
+        parent::denormalize($denormalizer, $data, $format);
     }
 
     public function getId()
@@ -36,7 +47,7 @@ class Token
 
     public function isValid()
     {
-    	$now = new \DateTime();
-    	return $now < $this->expires;
+        $now = new \DateTime();
+        return $now < $this->expires;
     }
 }

@@ -12,11 +12,14 @@
         }
     ],
 
+    "minimum-stability": "dev",
+
     "require": {
         "php": ">=5.3.2",
         "cowlby/cloud-bindings-common": "dev-master",
         "guzzle/guzzle": "*",
-        "pimple/pimple": "dev-master"
+        "pimple/pimple": "dev-master",
+        "symfony/serializer": "2.1.*"
     },
 
     "require-dev": {
@@ -25,7 +28,8 @@
 
     "autoload": {
         "psr-0": {
-            "Cowlby\\Rackspace\\Cloud\\Identity": "src/"
+            "Cowlby\\Rackspace\\Cloud\\Identity": "src/",
+            "Cowlby\\Tests\\Rackspace\\Cloud\\Identity": "tests/"
         }
     },
 
