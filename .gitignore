@@ -2,3 +2,4 @@ vendor
 
 tests/sandbox.php
 /composer.lock
+/phpunit.xml
