@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Jose Prado <cowlby@me.com>
  */
-class AuthManager extends AbstractEntityManager
+class AuthManager extends AbstractEntityManager implements AuthManagerInterface
 {
     /**
      * @var \Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface

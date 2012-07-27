@@ -10,10 +10,10 @@ namespace Cowlby\Rackspace\Cloud\Identity;
 interface ServiceContainerInterface
 {
     /**
-     * Returns a AuthManager instance which can be used to acquire tokens
-     * and service catalogs.
+     * Returns a AuthManagerInterface instance which can be used to acquire
+     * tokens and service catalogs.
      *
-     * @return \Cowlby\Rackspace\Cloud\Identity\AuthManager
+     * @return \Cowlby\Rackspace\Cloud\Identity\AuthManagerInterface
      */
     function getAuthManager();
 }

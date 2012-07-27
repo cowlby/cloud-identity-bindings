@@ -3,9 +3,9 @@
 namespace Cowlby\Rackspace\Cloud\Identity;
 
 use Pimple;
+use Cowlby\Rackspace\Cloud\Identity\EntityManager;
 use Cowlby\Rackspace\Cloud\Common\Cache\NullCacheAdapter;
 use Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface;
-use Cowlby\Rackspace\Cloud\Identity\EntityManager;
 use Guzzle\Http\Client;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -77,7 +77,7 @@ class ServiceContainer extends Pimple implements ServiceContainerInterface
 
     /**
      * {@inheritDoc}
-     * @return \Cowlby\Rackspace\Cloud\Identity\EntityManager\AuthManager
+     * @return \Cowlby\Rackspace\Cloud\Identity\EntityManager\AuthManagerInterface
      */
     public function getAuthManager()
     {
