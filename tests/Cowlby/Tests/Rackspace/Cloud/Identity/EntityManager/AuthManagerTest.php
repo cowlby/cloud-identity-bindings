@@ -3,7 +3,7 @@
 namespace Cowlby\Tests\Rackspace\Cloud\Identity\EntityManager;
 
 use Guzzle\Http\Message\Response;
-use Cowlby\Rackspace\Cloud\Common\Cache\NullCacheAdapter;
+use Cowlby\Rackspace\Common\Cache\NullCacheAdapter;
 use Cowlby\Rackspace\Cloud\Identity\EntityManager\AuthManager;
 
 class AuthManagerTest extends EntityManagerTestCase

@@ -2,13 +2,10 @@
 
 namespace Cowlby\Tests\Rackspace\Cloud\Identity\EntityManager;
 
-use Cowlby\Rackspace\Cloud\Identity\Http\GuzzleClientAdapter;
-use Cowlby\Tests\Rackspace\Cloud\Identity\TestCase;
 use Guzzle\Http\Client;
 use Guzzle\Http\Plugin\MockPlugin;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Cowlby\Tests\Rackspace\Cloud\Identity\TestCase;
+use Cowlby\Rackspace\Common\Http\GuzzleClientAdapter;
 
 class EntityManagerTestCase extends TestCase
 {
@@ -16,22 +13,15 @@ class EntityManagerTestCase extends TestCase
 
     protected $mockPlugin;
 
-    protected $serializer;
-
     /**
      * Prepares the environment before running a test.
      */
     protected function setUp()
     {
-        $this->serializer = new Serializer(
-            array(new CustomNormalizer()),
-            array('json' => new JsonEncoder())
-        );
-
         $guzzle = new Client();
         $this->mockPlugin = new MockPlugin();
         $guzzle->addSubscriber($this->mockPlugin);
-        $this->client = new GuzzleClientAdapter($guzzle, $this->serializer);
+        $this->client = new GuzzleClientAdapter($guzzle);
     }
 
     /**
@@ -41,6 +31,5 @@ class EntityManagerTestCase extends TestCase
     {
         $this->client = NULL;
         $this->mockPlugin = NULL;
-        $this->serializer = NULL;
     }
 }

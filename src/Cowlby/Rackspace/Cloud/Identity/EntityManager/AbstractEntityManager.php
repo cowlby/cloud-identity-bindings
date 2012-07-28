@@ -2,7 +2,7 @@
 
 namespace Cowlby\Rackspace\Cloud\Identity\EntityManager;
 
-use Cowlby\Rackspace\Cloud\Identity\Http\ClientAdapterInterface;
+use Cowlby\Rackspace\Common\Http\ClientAdapterInterface;
 
 abstract class AbstractEntityManager
 {

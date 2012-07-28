@@ -3,14 +3,11 @@
 namespace Cowlby\Rackspace\Cloud\Identity;
 
 use Pimple;
-use Cowlby\Rackspace\Cloud\Identity\EntityManager;
-use Cowlby\Rackspace\Cloud\Common\Cache\NullCacheAdapter;
-use Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface;
-use Cowlby\Rackspace\Cloud\Identity\Http\GuzzleClientAdapter;
 use Guzzle\Http\Client;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
+use Cowlby\Rackspace\Common\Cache\NullCacheAdapter;
+use Cowlby\Rackspace\Common\Http\GuzzleClientAdapter;
+use Cowlby\Rackspace\Cloud\Identity\EntityManager\AuthManager;
+use Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface;
 
 class ServiceContainer extends Pimple implements ServiceContainerInterface
 {
@@ -29,27 +26,12 @@ class ServiceContainer extends Pimple implements ServiceContainerInterface
 
         $this['endpoint'] = self::AUTH_ENDPOINT_US;
 
-        $this['serializer.normalizer'] = $this->share(function($container) {
-            return new CustomNormalizer();
-        });
-
-        $this['serializer.encoder.json'] = $this->share(function($container) {
-            return new JsonEncoder();
-        });
-
-        $this['serializer'] = $this->share(function($container) {
-            return new Serializer(
-                array($container['serializer.normalizer']),
-                array('json' => $container['serializer.encoder.json'])
-            );
-        });
-
         $this['cache'] = $this->share(function($container) {
 
             return new NullCacheAdapter();
         });
 
-        $this['client'] = $this->share(function($container) {
+        $this['guzzle'] = $this->share(function($container) {
 
             $client = new Client($container['endpoint'] . '/v{version}', array(
                 'version' => '1.1',
@@ -62,12 +44,16 @@ class ServiceContainer extends Pimple implements ServiceContainerInterface
                 'Accept' => 'application/json'
             ));
 
-            return new GuzzleClientAdapter($client, $container['serializer']);
+            return $client;
+        });
+
+        $this['client'] = $this->share(function($container) {
+            return new GuzzleClientAdapter($container['guzzle']);
         });
 
         $this['auth_manager'] = $this->share(function($container) {
 
-            return new EntityManager\AuthManager(
+            return new AuthManager(
                 $container['client'],
                 $container['credentials'],
                 $container['cache']

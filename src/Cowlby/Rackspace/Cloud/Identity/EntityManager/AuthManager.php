@@ -2,10 +2,9 @@
 
 namespace Cowlby\Rackspace\Cloud\Identity\EntityManager;
 
-use Cowlby\Rackspace\Cloud\Identity\Http\ClientAdapterInterface;
-use Cowlby\Rackspace\Cloud\Common\Cache\CacheAdapterInterface;
+use Cowlby\Rackspace\Common\Http\ClientAdapterInterface;
+use Cowlby\Rackspace\Common\Cache\CacheAdapterInterface;
 use Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface;
-use Cowlby\Rackspace\Cloud\Identity\Entity;
 
 /**
  * The AuthManager can authenticate against the Cloud Identity API and
