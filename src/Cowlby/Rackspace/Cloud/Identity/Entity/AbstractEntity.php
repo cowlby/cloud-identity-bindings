@@ -2,20 +2,8 @@
 
 namespace Cowlby\Rackspace\Cloud\Identity\Entity;
 
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizableInterface;
+use Cowlby\Rackspace\Common\Entity\AbstractEntity as BaseAbstractEntity;
 
-abstract class AbstractEntity implements DenormalizableInterface
+abstract class AbstractEntity extends BaseAbstractEntity
 {
-    public function denormalize(DenormalizerInterface $denormalizer, $data, $format = NULL)
-    {
-        foreach ($data as $attribute => $value) {
-            $setter = 'set' . $attribute;
-            if (method_exists($this, $setter)) {
-                $this->$setter($value);
-            }
-        }
-
-        return $this;
-    }
 }
