@@ -6,6 +6,7 @@ use Pimple;
 use Cowlby\Rackspace\Cloud\Identity\EntityManager;
 use Cowlby\Rackspace\Cloud\Common\Cache\NullCacheAdapter;
 use Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface;
+use Cowlby\Rackspace\Cloud\Identity\Http\GuzzleClientAdapter;
 use Guzzle\Http\Client;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -61,14 +62,13 @@ class ServiceContainer extends Pimple implements ServiceContainerInterface
                 'Accept' => 'application/json'
             ));
 
-            return $client;
+            return new GuzzleClientAdapter($client, $container['serializer']);
         });
 
         $this['auth_manager'] = $this->share(function($container) {
 
             return new EntityManager\AuthManager(
                 $container['client'],
-                $container['serializer'],
                 $container['credentials'],
                 $container['cache']
             );

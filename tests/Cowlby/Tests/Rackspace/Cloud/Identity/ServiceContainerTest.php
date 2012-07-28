@@ -14,7 +14,7 @@ class ServiceContainerTest extends TestCase
     protected function setUp()
     {
         $credentials = $this->getMock('Cowlby\\Rackspace\\Cloud\\Identity\\Credentials\\CredentialsInterface');
-        $client = $this->getMock('Guzzle\\Http\\Client');
+        $client = $this->getMock('Cowlby\\Rackspace\\Cloud\\Identity\\Http\\ClientAdapterInterface');
 
         $this->container = new ServiceContainer($credentials);
         $this->container['client'] = $client;

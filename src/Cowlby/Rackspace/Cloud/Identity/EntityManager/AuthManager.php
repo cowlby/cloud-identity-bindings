@@ -2,12 +2,10 @@
 
 namespace Cowlby\Rackspace\Cloud\Identity\EntityManager;
 
-use Guzzle\Http\ClientInterface;
+use Cowlby\Rackspace\Cloud\Identity\Http\ClientAdapterInterface;
 use Cowlby\Rackspace\Cloud\Common\Cache\CacheAdapterInterface;
 use Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface;
 use Cowlby\Rackspace\Cloud\Identity\Entity;
-use Guzzle\Http\Exception\BadResponseException;
-use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * The AuthManager can authenticate against the Cloud Identity API and
@@ -19,36 +17,30 @@ use Symfony\Component\Serializer\SerializerInterface;
 class AuthManager extends AbstractEntityManager implements AuthManagerInterface
 {
     /**
-     * @var \Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface
+     * @var CredentialsInterface
      */
     protected $credentials;
 
     /**
-     * @var \Cowlby\Rackspace\Cloud\Common\Cache\CacheAdapterInterface
+     * @var CacheAdapterInterface
      */
     protected $cache;
 
     /**
-     * @var \Cowlby\Rackspace\Cloud\Identity\Entity\Token
+     * @var Entity\Auth
      */
-    protected $token;
-
-    /**
-     * @var \Cowlby\Rackspace\Cloud\Identity\Entity\ServiceCatalog
-     */
-    protected $serviceCatalog;
+    protected $auth;
 
     /**
      * {@inheritDoc}
      *
-     * @param ClientInterface $client
-     * @param SerializerInterface $serializer
+     * @param ClientAdapterInterface $client
      * @param CredentialsInterface $credentials
      * @param CacheAdapterInterface $cache
      */
-    public function __construct(ClientInterface $client, SerializerInterface $serializer, CredentialsInterface $credentials, CacheAdapterInterface $cache)
+    public function __construct(ClientAdapterInterface $client, CredentialsInterface $credentials, CacheAdapterInterface $cache)
     {
-        parent::__construct($client, $serializer);
+        parent::__construct($client);
         $this->setCredentials($credentials);
         $this->setCache($cache);
     }
@@ -56,8 +48,8 @@ class AuthManager extends AbstractEntityManager implements AuthManagerInterface
     /**
      * Sets the credentials.
      *
-     * @param \Cowlby\Rackspace\Cloud\Identity\Credentials\CredentialsInterface $credentials
-     * @return \Cowlby\Rackspace\Cloud\Identity\TokenManager
+     * @param CredentialsInterface $credentials
+     * @return \Cowlby\Rackspace\Cloud\Identity\AuthManager
      */
     public function setCredentials(CredentialsInterface $credentials)
     {
@@ -68,8 +60,8 @@ class AuthManager extends AbstractEntityManager implements AuthManagerInterface
     /**
      * Sets the CacheAdapter to use for Token and ServiceCatalog caching.
      *
-     * @param \Cowlby\Rackspace\Cloud\Common\Cache\CacheAdapterInterface $cache
-     * @return \Cowlby\Rackspace\Cloud\Identity\TokenManager
+     * @param CacheAdapterInterface $cache
+     * @return \Cowlby\Rackspace\Cloud\Identity\AuthManager
      */
     public function setCache(CacheAdapterInterface $cache)
     {
@@ -78,89 +70,33 @@ class AuthManager extends AbstractEntityManager implements AuthManagerInterface
     }
 
     /**
-     * Returns a valid Token to use for authentication.
-     *
-     * @return \Cowlby\Rackspace\Cloud\Identity\Entity\Token
-     */
-    public function getToken()
-    {
-        $token = $this->cache->fetch($this->getTokenCacheId());
-
-        if ($token === FALSE) {
-
-            $this->authenticate();
-        } else {
-
-            $this->token = unserialize($token);
-
-            if (!$this->token->isValid()) {
-                $this->authenticate();
-            }
-        }
-
-        return $this->token;
-    }
-
-    /**
-     * Returns a ServiceCatalog to use in finding service endpoints.
-     *
-     * @return \Cowlby\Rackspace\Cloud\Identity\Entity\ServiceCatalog
-     */
-    public function getServiceCatalog()
-    {
-        $serviceCatalog = $this->cache->fetch($this->getServiceCatalogCacheId());
-
-        if ($serviceCatalog === FALSE) {
-            $this->authenticate();
-        } else {
-            $this->serviceCatalog = unserialize($serviceCatalog);
-        }
-
-        return $this->serviceCatalog;
-    }
-
-    /**
-     * Gets a unique cache id to use when storing the Token.
+     * Gets a unique cache id to use when storing the Auth entity.
      *
      * @return string
      */
-    protected function getTokenCacheId()
+    protected function getAuthCacheId()
     {
-        return sprintf('[%s][%s]', md5($this->credentials->getPayload()), 'token');
+        return sprintf('[%s][%s]', md5($this->credentials->getPayload()), 'auth');
     }
 
     /**
-     * Gets a unique cache id to use when caching the ServiceCatalog.
-     *
-     * @return string
+     * {@inheritDoc}
+     * @return \Cowlby\Rackspace\Cloud\Identity\Entity\Auth
      */
-    protected function getServiceCatalogCacheId()
+    public function authenticate()
     {
-        return sprintf('[%s][%s]', md5($this->credentials->getPayload()), 'serviceCatalog');
-    }
+        $auth = $this->cache->fetch($this->getAuthCacheId());
 
-    /**
-     * Authenticates against the Cloud Identity API and retrieves the token
-     * and service catalog data if successful.
-     *
-     * @return \Cowlby\Rackspace\Cloud\Identity\TokenManager
-     */
-    protected function authenticate()
-    {
-        $request = $this->client->post('auth', NULL, $this->credentials->getPayload());
-        $response = $this->client->send($request);
+        if ($auth !== FALSE) {
+            $auth = unserialize($auth);
+        }
 
-        $data = $this->serializer->decode($response->getBody(), 'json');
+        if ($auth === FALSE || !$auth->isValid()) {
+            $authClass = 'Cowlby\\Rackspace\\Cloud\\Identity\\Entity\\Auth';
+            $auth = $this->client->post('auth', $authClass, $this->credentials->getPayload());
+            $this->cache->save($this->getAuthCacheId(), serialize($auth));
+        }
 
-        $tokenClass = 'Cowlby\\Rackspace\\Cloud\\Identity\\Entity\\Token';
-        $this->token = $this->serializer->denormalize($data['auth']['token'], $tokenClass);
-
-        $catalogClass = 'Cowlby\\Rackspace\\Cloud\\Identity\\Entity\\ServiceCatalog';
-        $this->serviceCatalog = $this->serializer->denormalize($data['auth']['serviceCatalog'], $catalogClass);
-
-        $this->cache->save($this->getTokenCacheId(), serialize($this->token));
-        $this->cache->save($this->getServiceCatalogCacheId(), serialize($this->serviceCatalog));
-
-        return $this;
+        return $auth;
     }
 }
